@@ -10,7 +10,8 @@ MONGO_URL = 'mongodb://{}:{}@192.168.1.21:27017'.format(USER,PASSWORD)
 
 client = MongoClient(MONGO_URL)
 client.drop_database('quran')
-db=client.quran
+client.drop_database('quran_fr')
+db=client.quran_fr
 
 
 list_of_surah_name = []
@@ -36,12 +37,15 @@ data = open('resources/quran_fr.json','r',encoding='utf-8')
 surah_data = json.load(data)
 
 for surah in surah_data:
-    if surah['transliteration'] == 'Al-Fatihah':
+    if surah['transliteration'] in list_of_surah_name:
         collection = surah['transliteration']
+        print(collection)
         verses = surah['verses']
+        documents = []
         for verse in verses:
             aya_number = verse['id']
             translation = verse['translation']
             document = {'aya_number' : aya_number, 'translation': translation}
-            db.get_collection(collection).insert_one(document)
+            documents.append(document)
+        db.get_collection(collection).insert_many(documents)
 
